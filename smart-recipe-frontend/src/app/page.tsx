@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const CURRENT_USER_ID = "demoUser4"; 
 
-// --- CENTRALIZED INGREDIENT IMAGE MAP (Unchanged) ---
+// --- CENTRALIZED INGREDIENT IMAGE MAP (For Visuals) ---
 const INGREDIENT_IMAGE_MAP: { [key: string]: string } = {
     "Chicken": "/images/ingredients/chicken.png", "Beef": "/images/ingredients/beef.jpeg",
     "Ground Beef": "/images/ingredients/groundbeef.jpeg", "Salmon": "/images/ingredients/salmon.jpeg",
@@ -53,7 +53,7 @@ interface Recipe {
     nutritionalInfo: { calories: number; proteinGrams: number; fatGrams: number };
     substitutionSuggestions?: { [key: string]: string };
     averageRating: number;
-    coverageScore?: number;
+    coverageScore?: number; // Optional on initial data load
     missingIngredients?: string[];
     substitutions?: { [key: string]: string };
     ratings?: { [userId: string]: number };
@@ -595,7 +595,7 @@ const RecipeCard = ({ recipe, handleUserAction, userId, userFavorites }:
                 <div className="text-sm space-y-1 pb-3 border-b border-gray-100">
                     {hasScoreData && (
                         <p className="font-semibold text-blue-700 text-base flex items-center">
-                            <span className="mr-1">✅</span> Match Score: {(recipe.coverageScore * 100).toFixed(0)}%
+                            <span className="mr-1">✅</span> Match Score: {(recipe.coverageScore! * 100).toFixed(0)}%
                         </p>
                     )}
                     <p><strong className="text-gray-700">Cuisine:</strong> {recipe.filters.cuisine}</p>
