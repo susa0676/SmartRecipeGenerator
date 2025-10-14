@@ -64,7 +64,7 @@ const [recipes, setRecipes] = useState<any[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   // --- API CALLS ---
   const fetchSuggestions = async () => {
