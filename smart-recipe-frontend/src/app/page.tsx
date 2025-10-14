@@ -12,7 +12,7 @@ const INGREDIENT_IMAGE_MAP: { [key: string]: string } = {
     "Tuna": "/images/ingredients/tuna.jpeg", "Tomato": "/images/ingredients/tomato.jpeg", 
     "Onion": "/images/ingredients/onion.jpeg", "Garlic": "/images/ingredients/garlic.jpeg",
     "Potato": "/images/ingredients/potato.jpeg", "Broccoli": "/images/ingredients/broccoli.jpeg",
-    "Spinach": "/images/ingredients/spinach.jpeg", "Asparages": "/images/ingredients/asparagus.jpeg",
+    "Spinach": "/images/ingredients/spinach.jpeg", "Asparagus": "/images/ingredients/asparagus.jpeg",
     "Celery": "/images/ingredients/celery.jpeg", "Corn": "/images/ingredients/corn.jpeg",
     "Banana": "/images/ingredients/banana.jpeg", "Lemon": "/images/ingredients/lemon.jpeg",
     "Lime": "/images/ingredients/lime.jpeg", "Ginger": "/images/ingredients/ginger.jpeg",
@@ -463,7 +463,7 @@ export default function Home() {
 
 const SuggestionCard = ({ recipe }: { recipe: Recipe }) => { // FIX: Type prop
     return (
-        <div className className="p-4 border border-amber-300 bg-white rounded-lg shadow-md hover:shadow-xl transition duration-300 transform hover:scale-[1.02]">
+        <div className="p-4 border border-amber-300 bg-white rounded-lg shadow-md hover:shadow-xl transition duration-300 transform hover:scale-[1.02]">
             <h5 className="font-semibold text-base text-gray-800 leading-tight">{recipe.name}</h5>
             <p className="text-xs text-gray-500 mt-1">Cuisine: {recipe.filters.cuisine} • {recipe.filters.cookingTimeMinutes} min</p>
             <p className="text-xs text-amber-700 mt-2 font-medium">
