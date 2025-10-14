@@ -15,11 +15,19 @@ MONGO_URI = os.getenv("MONGO_URI")
 # 2. Initialize FastAPI app
 app = FastAPI(title="Smart Recipe Generator API")
 
-# --- CONFIGURE CORS MIDDLEWARE ---
+# --- CONFIGURE CORS MIDDLEWARE (FINAL DEPLOYMENT FIX) ---
 origins = [
+    # Local Development Origins
     "http://localhost",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    
+    # Render and Vercel Live Deployment Origins
+    "https://smart-recipe-generator-bay.vercel.app", 
+    "https://smart-recipe-generator-bay.vercel.app/",
+    "https://smartrecipegenerator-kn6d.onrender.com",
+    "https://smartrecipegenerator-kn6d.onrender.com/",
+    "https://smart-recipe-generator-bay.vercel.app", # Final Vercel URL (based on your logs)
 ]
 
 app.add_middleware(
@@ -43,7 +51,8 @@ async def startup_db_client():
 
     try:
         app.mongodb_client = AsyncIOMotorClient(MONGO_URI)
-        app.mongodb = app.mongodb_client.get_database("SmartRecipeDB")
+        # Assuming the database name is SmartRecipeDB
+        app.mongodb = app.mongodb_client.get_database("SmartRecipeDB") 
         print("Successfully connected to MongoDB Atlas.")
     except Exception as e:
         print(f"Failed to connect to MongoDB: {e}")
@@ -61,7 +70,7 @@ async def root():
     return {"message": "Smart Recipe Generator API is running."}
 
 
-# --- ROUTE: GET ALL CANONICAL INGREDIENTS (UNMODIFIED) ---
+# --- ROUTE: GET ALL CANONICAL INGREDIENTS ---
 
 @app.get("/api/ingredients", response_model=List[str])
 async def get_canonical_ingredients():
@@ -95,9 +104,9 @@ class RecipeSearchQuery(BaseModel):
     is_gluten_free: Optional[bool] = None
 
 class RateInput(BaseModel):
+    """Model for accepting a user rating."""
     user_id: str = Field(..., description="Unique ID of the user submitting the rating.")
     rating: int = Field(..., ge=1, le=5, description="The user's rating (1 to 5).")
-
 
 @app.post("/api/recipes/search")
 async def search_recipes(query: RecipeSearchQuery):
@@ -228,6 +237,26 @@ async def rate_recipe(recipe_id: str, data: RateInput):
         raise HTTPException(status_code=500, detail=f"Rating submission failed: {str(e)}")
 
 
+# --- NEW ROUTE: FETCH USER HISTORY (FOR FRONTEND PERSISTENCE) ---
+@app.get("/api/user/{user_id}/history")
+async def get_user_history(user_id: str):
+    """
+    Fetches the user's favorite list to populate UI state upon refresh.
+    """
+    if app.mongodb is None:
+        raise HTTPException(status_code=503, detail="Database connection not initialized.")
+
+    try:
+        # Get favorite IDs
+        favorite_list = await app.mongodb["favorites"].find({"user_id": user_id}).to_list(None)
+        favorite_ids = [fav['recipe_id'] for fav in favorite_list]
+        
+        return {"favorites": favorite_ids}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"History fetch failed: {str(e)}")
+
+
 # --- ROUTE: RECIPE SUGGESTIONS (Recommendation System) ---
 
 @app.get("/api/user/{user_id}/suggestions")
@@ -239,6 +268,7 @@ async def get_user_suggestions(user_id: str):
         favorite_list = await app.mongodb["favorites"].find({"user_id": user_id}).to_list(None)
         
         if not favorite_list:
+            # Fallback: show the top 5 highest-rated recipes
             random_cursor = app.mongodb["recipes"].find().sort("averageRating", -1).limit(5)
             suggestions = await random_cursor.to_list(None)
             for recipe in suggestions:
@@ -279,30 +309,3 @@ async def get_user_suggestions(user_id: str):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Suggestion failed: {str(e)}")
-
-# --- NEW ROUTE: FETCH USER HISTORY (FOR FRONTEND PERSISTENCE) ---
-
-@app.get("/api/user/{user_id}/history")
-async def get_user_history(user_id: str):
-    """
-    Fetches the user's favorite list and ratings to populate UI state upon refresh.
-    """
-    if app.mongodb is None:
-        raise HTTPException(status_code=503, detail="Database connection not initialized.")
-
-    try:
-        # 1. Get favorite IDs
-        favorite_list = await app.mongodb["favorites"].find({"user_id": user_id}).to_list(None)
-        favorite_ids = [fav['recipe_id'] for fav in favorite_list]
-
-        # 2. Get user's ratings from the recipes collection
-        # This requires retrieving ALL recipes and filtering out the user's rating
-        # Simpler approach: find favorited recipes and check their rating field
-        
-        # We don't need a heavy query here; we just return the favorited IDs.
-        # The rating history is inferred by the frontend when a recipe is displayed.
-        
-        return {"favorites": favorite_ids}
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"History fetch failed: {str(e)}")
