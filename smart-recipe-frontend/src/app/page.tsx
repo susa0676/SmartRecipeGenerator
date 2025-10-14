@@ -41,8 +41,11 @@ const INGREDIENT_IMAGE_MAP = {
 
 
 export default function Home() {
-  const [canonicalIngredients, setCanonicalIngredients] = useState([]);
-  const [recipes, setRecipes] = useState([]);
+ const [canonicalIngredients, setCanonicalIngredients] = useState<string[]>([]);
+// -------------------------------------------------------------
+
+// You should also update the recipes state for clarity (though not strictly necessary for this error):
+const [recipes, setRecipes] = useState<any[]>([]);
   const [suggestions, setSuggestions] = useState([]);
   
   const [userFavorites, setUserFavorites] = useState(new Set()); 
