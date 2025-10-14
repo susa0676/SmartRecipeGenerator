@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { SetStateAction } from 'react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const CURRENT_USER_ID = "demoUser4"; 
@@ -38,6 +39,7 @@ const INGREDIENT_IMAGE_MAP: { [key: string]: string } = {
     "Tofu": "/images/ingredients/tofu.jpeg", "Oil": "/images/ingredients/oils.jpeg",
     "Chocolate Chips": "/images/ingredients/chocolatechips.jpeg"
 };
+// ------------------------------------------------------------------
 
 
 // Define the Recipe interface for type safety
@@ -108,6 +110,19 @@ export default function Home() {
             return false;
         }
     };
+
+    // FIX: This function chains the updates correctly
+    const handleUserAction = async () => {
+        // 1. Force state to update first, which often helps subsequent effects fire
+        setFavoritesChanged(prev => prev + 1);
+
+        // 2. Refresh History and wait for it to complete
+        await fetchUserHistory(); 
+
+        // 3. Refresh Suggestions (now guaranteed to run with the updated history data)
+        fetchSuggestions();
+    }
+
 
     // 3. Initial Data Load & Dependency Check (Runs on mount and on favorite change)
     useEffect(() => {
@@ -543,7 +558,11 @@ const RecipeCard = ({ recipe, handleUserAction, userId, userFavorites }:
                         src={recipe.mainImageUrl} 
                         alt={recipe.name} 
                         className="w-full h-full object-cover transition duration-300 hover:opacity-90" 
-                        onError={(e) => { e.target.onerror = null; e.target.src="/images/default.jpg" }}
+                        onError={(e) => { 
+                            const target = e.target as HTMLImageElement; // FINAL FIX: Type assertion
+                            target.onerror = null; 
+                            target.src="/images/default.jpg"; 
+                        }}
                     />
                 </div>
             )}
