@@ -1,12 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { SetStateAction } from 'react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const CURRENT_USER_ID = "demoUser4"; 
 
-// --- CENTRALIZED INGREDIENT IMAGE MAP (For Visuals) ---
+// --- CENTRALIZED INGREDIENT IMAGE MAP (Unchanged) ---
 const INGREDIENT_IMAGE_MAP: { [key: string]: string } = {
     "Chicken": "/images/ingredients/chicken.png", "Beef": "/images/ingredients/beef.jpeg",
     "Ground Beef": "/images/ingredients/groundbeef.jpeg", "Salmon": "/images/ingredients/salmon.jpeg",
@@ -62,12 +61,10 @@ interface Recipe {
 
 
 export default function Home() {
-    // FIX: Explicitly typed state arrays
     const [canonicalIngredients, setCanonicalIngredients] = useState<string[]>([]);
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [suggestions, setSuggestions] = useState<Recipe[]>([]);
     
-    // Set<string> is used for ingredient IDs and favorite recipe IDs
     const [userFavorites, setUserFavorites] = useState<Set<string>>(new Set()); 
     
     const [favoritesChanged, setFavoritesChanged] = useState(0); 
@@ -75,7 +72,6 @@ export default function Home() {
     const [selectedIngredients, setSelectedIngredients] = useState<Set<string>>(new Set()); 
     const [textInput, setTextInput] = useState(''); 
     
-    // FIX: Explicitly typed error state (string or null)
     const [error, setError] = useState<string | null>(null); 
     
     const [filters, setFilters] = useState({
@@ -112,12 +108,12 @@ export default function Home() {
     };
 
     // FIX: This function chains the updates correctly
-    const handleUserAction = async () => {
+    const handleUserAction = () => {
         // 1. Force state to update first, which often helps subsequent effects fire
         setFavoritesChanged(prev => prev + 1);
 
         // 2. Refresh History and wait for it to complete
-        await fetchUserHistory(); 
+        fetchUserHistory(); 
 
         // 3. Refresh Suggestions (now guaranteed to run with the updated history data)
         fetchSuggestions();
@@ -326,7 +322,11 @@ export default function Home() {
                                             src={INGREDIENT_IMAGE_MAP[ingredient] || '/images/default.jpg'} 
                                             alt={ingredient} 
                                             className="w-full h-full object-cover" 
-                                            onError={(e) => { e.target.onerror = null; e.target.src="/images/default.jpg" }} // Fallback
+                                            onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => { 
+                                                const target = e.target as HTMLImageElement;
+                                                target.onerror = null; 
+                                                target.src="/images/default.jpg"; 
+                                            }}
                                         />
                                     </div>
                                     {/* ------------------------- */}
@@ -558,8 +558,8 @@ const RecipeCard = ({ recipe, handleUserAction, userId, userFavorites }:
                         src={recipe.mainImageUrl} 
                         alt={recipe.name} 
                         className="w-full h-full object-cover transition duration-300 hover:opacity-90" 
-                        onError={(e) => { 
-                            const target = e.target as HTMLImageElement; // FINAL FIX: Type assertion
+                        onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => { 
+                            const target = e.target as HTMLImageElement;
                             target.onerror = null; 
                             target.src="/images/default.jpg"; 
                         }}
