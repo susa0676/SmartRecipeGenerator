@@ -1,14 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { SetStateAction } from 'react'; // Added for clarity in complex state setting
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const CURRENT_USER_ID = "demoUser4"; // Changed to demoUser4 as seen in your logs
+const CURRENT_USER_ID = "demoUser4"; 
 
-// --- CENTRALIZED INGREDIENT IMAGE MAP (Unchanged) ---
+// --- CENTRALIZED INGREDIENT IMAGE MAP (For Visuals) ---
 const INGREDIENT_IMAGE_MAP: { [key: string]: string } = {
-    // Note: TypeScript requires the map to be explicitly typed as { [key: string]: string }
     "Chicken": "/images/ingredients/chicken.png", "Beef": "/images/ingredients/beef.jpeg",
     "Ground Beef": "/images/ingredients/groundbeef.jpeg", "Salmon": "/images/ingredients/salmon.jpeg",
     "Tuna": "/images/ingredients/tuna.jpeg", "Tomato": "/images/ingredients/tomato.jpeg", 
@@ -40,10 +38,9 @@ const INGREDIENT_IMAGE_MAP: { [key: string]: string } = {
     "Tofu": "/images/ingredients/tofu.jpeg", "Oil": "/images/ingredients/oils.jpeg",
     "Chocolate Chips": "/images/ingredients/chocolatechips.jpeg"
 };
-// ------------------------------------------------------------------
 
 
-// Define a basic interface for a recipe object for clarity and type safety
+// Define the Recipe interface for type safety
 interface Recipe {
     _id: string;
     name: string;
@@ -76,7 +73,7 @@ export default function Home() {
     const [selectedIngredients, setSelectedIngredients] = useState<Set<string>>(new Set()); 
     const [textInput, setTextInput] = useState(''); 
     
-    // FIX: Explicitly typed error state
+    // FIX: Explicitly typed error state (string or null)
     const [error, setError] = useState<string | null>(null); 
     
     const [filters, setFilters] = useState({
@@ -128,7 +125,8 @@ export default function Home() {
                 }
                 
             } catch (err) {
-                setError("Error: Could not load ingredients list."); // Now safe to set string
+                // FIX: Setting string | null is safe now
+                setError("Error: Could not load ingredients list."); 
                 setCanonicalIngredients([]); 
             } finally {
                 setIsLoading(false);
@@ -159,8 +157,13 @@ export default function Home() {
         });
     };
 
-    const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => { // FIX: Type event
-        const { name, value, type, checked } = e.target;
+    // FIX: Type filter handler to resolve checked property error
+    const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => { 
+        const { name, value, type } = e.target;
+        
+        // FIX: Use type assertion to safely access 'checked' only if the element is a checkbox
+        const checked = (e.target as HTMLInputElement).checked; 
+        
         setFilters(prev => ({
             ...prev,
             [name]: type === 'checkbox' ? checked : value,
