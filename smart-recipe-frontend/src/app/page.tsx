@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const CURRENT_USER_ID = "demoUser4"; 
 
-// --- CENTRALIZED INGREDIENT IMAGE MAP (For Visuals) ---
+// --- CENTRALIZED INGREDIENT IMAGE MAP (Unchanged) ---
 const INGREDIENT_IMAGE_MAP: { [key: string]: string } = {
     "Chicken": "/images/ingredients/chicken.png", "Beef": "/images/ingredients/beef.jpeg",
     "Ground Beef": "/images/ingredients/groundbeef.jpeg", "Salmon": "/images/ingredients/salmon.jpeg",
@@ -57,6 +57,8 @@ interface Recipe {
     missingIngredients?: string[];
     substitutions?: { [key: string]: string };
     ratings?: { [userId: string]: number };
+    // FIX: Add the instructions property to satisfy the RecipeCard component
+    instructions: string[]; 
 }
 
 
@@ -556,7 +558,7 @@ const RecipeCard = ({ recipe, handleUserAction, userId, userFavorites }:
             
             {/* RECIPE IMAGE DISPLAY */}
             {recipe.mainImageUrl && (
-                <div className="h-52 w-full overflow-hidden bg-gray-100">
+                <div className className="h-52 w-full overflow-hidden bg-gray-100">
                     <img 
                         src={recipe.mainImageUrl} 
                         alt={recipe.name} 
@@ -661,7 +663,7 @@ const RecipeCard = ({ recipe, handleUserAction, userId, userFavorites }:
             
             {/* Expanded Details Section - HIGHLY VISUAL */}
             {isDetailsOpen && (
-                <div className="bg-white p-6 border-t border-blue-100">
+                <div className className="bg-white p-6 border-t border-blue-100">
                     
                     <h4 className="font-bold text-lg mb-3 text-gray-800 border-b border-teal-300 pb-1 flex items-center">
                         <span className="text-xl mr-2 text-teal-500">🥣</span> Ingredients ({recipe.servingSize} Servings)
