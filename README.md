@@ -1,8 +1,3 @@
-I cannot provide a direct file download link, but I can give you the **complete text of the `README.md`** file, formatted in Markdown.
-
-You can easily copy this text and paste it directly into a file named **`README.md`** in the root of your GitHub repository. This structure is designed for clean alignment and professional presentation.
-
------
 
 # 🧑‍🍳 Smart Recipe Generator
 
