@@ -9,7 +9,7 @@ This project is a full-stack application developed as a technical assessment for
 | :--- | :--- | :--- |
 | **Live Frontend (Vercel)** | **Deployed** | **https://smart-recipe-generator-bay.vercel.app/** |
 | **Live Backend API (Render)** | **Deployed** | **https://smartrecipegenerator-kn6d.onrender.com** |
-| **GitHub Repository** | **Final Code** | `https://github.com/susa0676/SmartRecipeGenerator` |
+| **GitHub Repository** | **Final Code** | **https://github.com/susa0676/SmartRecipeGenerator** |
 
 ### Repository Structure
 
